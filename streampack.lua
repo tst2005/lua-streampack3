@@ -85,7 +85,6 @@ local function decode(data, marksize, alphabet)
 		
 		append(result, seg)
 	end
-	--return setmetatable(result, {__tostring=function(self) return table.concat(self, "\n") end})
 	return result
 end
 
