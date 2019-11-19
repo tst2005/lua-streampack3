@@ -66,7 +66,7 @@ local function readmark(fd, marksize, alphabet)
 end
 
 
-local function decode1seg(fd, marksize, alphabet)
+local function fd_decode_seg(fd, marksize, alphabet)
 	local mark = readmark(fd, marksize, alphabet)
 	if not mark then return nil end
 	local seg, markfound = fd:read_until(mark)
@@ -74,18 +74,26 @@ local function decode1seg(fd, marksize, alphabet)
 	return seg
 end
 
-local function decode(data, marksize, alphabet)
+local function data_decode_seg(data, marksize, alphabet)
 	assert(type(marksize)=="number")
 	local fd = str2fd(data)
+	local function f()
+		local seg = fd_decode_seg(fd, marksize, alphabet)
+		if not seg then return nil end
+		return seg
+	end
+	return f
+end
+local function data_decode(data, marksize, alphabet)
 	local result = {}
+	local f = data_decode_seg(data, marksize, alphabet)
 	local append = table.insert
-	for i=1,10 do
-		local seg = decode1seg(fd, marksize, alphabet)
+	while true do
+		local seg = f()
 		if not seg then break end
-		
 		append(result, seg)
 	end
 	return result
 end
 
-return {encode=encode,decode=decode}
+return {encode=encode, decode=data_decode, decode_seg=data_decode_seg}
