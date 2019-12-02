@@ -37,3 +37,26 @@ do
 	local seg5 = f()
 	print(seg1, seg2, seg3, seg4, seg5)
 end
+
+do
+	local data = "abbaaab"
+	local raw_encoded = encode(data, 1)
+	local function special(x)
+		local i = i or 0
+		return function(x)
+			i = i or 0
+			local a = x[i+1]
+			local b = x[i+2]
+			local c = x[i+3]
+			i=i+3
+			return a, b, c
+		end, x
+	end
+	print("input:", data)
+	for a,b,c in special(raw_encoded) do
+		print("open:", a)
+		print("", "", b)
+		print("close", c)
+	end
+
+end
