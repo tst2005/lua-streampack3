@@ -56,76 +56,6 @@ end
 assert(mark_is_valid("abab", {"a", "b", "c"}))
 assert(not mark_is_valid("aBab", {"a", "b", "c"}))
 
-
-local function learn_from(seg, alphabet, hash)
-	assert(alphabet)
-	if not hash then
-		hash = {}
-	end
-	for c in string.gmatch(seg, ".") do
-		hash[c] = true
-	end
-	for c in pairs(hash) do
-		table.insert(alphabet, c)
-	end
-	return
-end
-do
-	local alphabet = {}
-	learn_from("aabbab", alphabet, nil)
-	assert(#alphabet==2)
-	local alphabet = {}
-	learn_from("aabbabcabaabb", alphabet, nil) 
-	assert(#alphabet==3)
-end
-
-local function encode(data, marksize, alphabet)
-	if type(data)=="string" then
-		data = str2fd(data)
-	end
-	if alphabet == nil then
-		alphabet={}
-		local hash={}
-		local seg = data:read(1024)
-		learn_from(seg, alphabet, hash)
-		assert(#alphabet>1)
-		data:seek("set", 0)
-		assert(data:seek() == 0)
-	end
-
-	local function choose_a_mark(alphabet, not_this)
-		for _i,c in ipairs(alphabet) do
-			if not is_in_table(c, not_this) then
-				return c
-			end
-		end
-	end
-	local result = {}
-	while true do
-		local first_c = data:read(1)
-		if first_c == "" then break end
-
---		local seg, markfound
---		local ok = pcall(function()
---			seg, markfound = data:read_until(first_c)
---		end)
---		if not ok then
---			seg = ""
---			print("data:read_until error")
---		else
---			print("data:read_until("..first_c..")", seg, markfound)
---		end
-
-		local mark = choose_a_mark(alphabet, {first_c})
-		table.insert(result, mark)
-		table.insert(result, first_c) --..seg)
-
-		table.insert(result, mark)
-	end
-	return result
-end
-
-
 -- read a mark
 -- TODO: FEATURE: allow noise inside mark, we can read data, remove noise, stop reading when the mark is completed
 -- current: only read a fixed size string as mark
@@ -172,4 +102,4 @@ local function data_decode(data, marksize, alphabet)
 	return result
 end
 
-return {encode=encode, decode=data_decode, decode_seg=data_decode_seg}
+return {decode=data_decode, decode_seg=data_decode_seg}

@@ -1,6 +1,6 @@
-local streampack = require "streampack"
-local encode = assert(streampack.encode)
-local decode = assert(streampack.decode)
+local encode = assert(require"streampack3.encoder-v1".encode)
+local decode = assert(require"streampack3.decoder".decode)
+local decode_seg = assert(require"streampack3.decoder".decode_seg)
 
 --local src = [[abcaabbccaaabbbccc]]
 --local alphabet = {"a","b","c"}
@@ -28,7 +28,7 @@ end
 do
         local alphabet = {"a","b"}
 	local encoded = ([[b aaa b a bb a b a b a bb a]]):gsub(" ","")
-	local decode_seg = assert(streampack.decode_seg)
+	assert(decode_seg)
 	local f = decode_seg(encoded, 1, alphabet)
 	local seg1 = f()
 	local seg2 = f()
