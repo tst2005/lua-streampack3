@@ -104,9 +104,22 @@ local function encode(data, marksize, alphabet)
 	while true do
 		local first_c = data:read(1)
 		if first_c == "" then break end
+
+--		local seg, markfound
+--		local ok = pcall(function()
+--			seg, markfound = data:read_until(first_c)
+--		end)
+--		if not ok then
+--			seg = ""
+--			print("data:read_until error")
+--		else
+--			print("data:read_until("..first_c..")", seg, markfound)
+--		end
+
 		local mark = choose_a_mark(alphabet, {first_c})
 		table.insert(result, mark)
-		table.insert(result, first_c)
+		table.insert(result, first_c) --..seg)
+
 		table.insert(result, mark)
 	end
 	return result
